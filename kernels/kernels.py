@@ -70,26 +70,42 @@ kernel_dict = {'edge_detection1': edge_detection1,\
 
 #kernel application
 def apply_kernel(image, kernel):
+    """
+    Takes in an image object (PIL) and a kernel array and returns an image \
+    object with the kernel applied
+
+    Args:
+        image: PIL image object
+        kernel: A 2d square numerical array
+
+    Returns:
+        A product of the image with kernel applied
+    """
+    #Changing image to np array
     im_array = np.array(image)
+    #Creating empty array of same size
     im_applied = np.zeros([int(im_array.shape[0]),int(im_array.shape[1]),3]).astype('uint8')
     for row in range(len(im_applied)):
         for col in range(len(im_applied[0])):
-            #cumulating according to kernel
+            #Cumulating according to kernel
             r_cumulated = 0
             b_cumulated = 0
             g_cumulated = 0
             mid_coor = len(kernel)//2
+            #Looping through each value of kernel
             for ker_row in range(len(kernel)):
                 for ker_col in range(len(kernel[0])):
+                    #Try-catch for kernel being on edge of the image
                     try:
                         r_cumulated += im_array[row+ker_row-mid_coor,col+ker_col-mid_coor,0]*kernel[ker_row,ker_col]
                         g_cumulated += im_array[row+ker_row-mid_coor,col+ker_col-mid_coor,1]*kernel[ker_row,ker_col]
                         b_cumulated += im_array[row+ker_row-mid_coor,col+ker_col-mid_coor,2]*kernel[ker_row,ker_col]
                     except:
                         pass
+            #Keeping values between possible range
             r_cumulated = max(min(r_cumulated, 255),0)
             g_cumulated = max(min(g_cumulated, 255),0)
             b_cumulated = max(min(b_cumulated, 255),0)
-            #applying to each pixel
+            #Applying to each pixel
             im_applied[row,col] = np.array([r_cumulated,g_cumulated,b_cumulated])
     return Image.fromarray(im_applied)
